@@ -149,7 +149,9 @@ void WineCooler::Run()
 
   // Update UI with new values
   mUI->Run();  
-  mDesiredTemp = mUI->mLastSetVal;
+  
+  // aim for the middle of the temp value, i.e. 48.5
+  mDesiredTemp = (mUI->mLastSetVal + 0.5);
   mUI->mCurTempVal = mInputTemp;
 
   // Run the PIDs with any input changes
