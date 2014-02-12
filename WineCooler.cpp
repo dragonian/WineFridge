@@ -4,8 +4,8 @@
 #define TEMP_MAX   (60)
 #define TEMP_MIN   (40)
    
-WineUI::WineUI(Adafruit_7segment * display, int digitNum ) :
-  mDisplay(display), mDigitPos(digitNum), delay30Sec(30*1000)
+WineUI::WineUI(Adafruit_7segment * display, int instance ) :
+  mDisplay(display), mInstance(instance), delay30Sec(30*1000)
 {
   mDisplayValue = 0;
   mLastSetVal = 55;
@@ -13,13 +13,16 @@ WineUI::WineUI(Adafruit_7segment * display, int digitNum ) :
 
   lightOn = false;
   settingTemp = false;
+
+  // Map the DigitPos to the instance number
+  // They are the same right now
+  mDigitPos = mInstance;
 }
 
 void WineUI::Setup()
 {
   // Read the last value out of the eeprom
-  // using digitNum overloaded here. kinda wrong. 
-  mLastSetVal = EEPROM.read(mDigitPos);
+  mLastSetVal = EEPROM.read(mInstance);
 
   mDisplay->writeDigitRaw(mDigitPos,   0x71);
   mDisplay->writeDigitRaw(mDigitPos+1, 0x71);

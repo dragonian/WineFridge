@@ -16,7 +16,7 @@ class WineUI
   friend class WineCooler;  // Let the Cooler access our members
 
 public:
-  WineUI(Adafruit_7segment * display, int digitNum);
+  WineUI(Adafruit_7segment * display, int instance);
 
   void Setup(void);
 
@@ -35,6 +35,7 @@ public:
 private:
   Adafruit_7segment * mDisplay;
   int mDigitPos;
+  int mInstance;
 
   int mDisplayValue;
   int mLastSetVal;
