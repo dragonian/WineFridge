@@ -1,4 +1,5 @@
 #include "WineCooler.h"
+#include <EEPROM.h>
 
 #define TEMP_MAX   (60)
 #define TEMP_MIN   (40)
@@ -16,6 +17,10 @@ WineUI::WineUI(Adafruit_7segment * display, int digitNum ) :
 
 void WineUI::Setup()
 {
+  // Read the last value out of the eeprom
+  // using digitNum overloaded here. kinda wrong. 
+  mLastSetVal = EEPROM.read(mDigitPos);
+
   mDisplay->writeDigitRaw(mDigitPos,   0x71);
   mDisplay->writeDigitRaw(mDigitPos+1, 0x71);
   mDisplay->writeDisplay();
@@ -35,6 +40,9 @@ void WineUI::Run()
       
       // Set the new temp value so it can be used by controller
       mLastSetVal = mDisplayValue;
+
+      // Save the value back to the eeprom
+      EEPROM.write(mLastSetVal, mDigitPos);
   
       // flip display back to current temp
       mDisplayValue = mCurTempVal;

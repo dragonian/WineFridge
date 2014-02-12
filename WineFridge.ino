@@ -11,6 +11,7 @@
 #include "AsyncDallasTemperature.h"
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include <EEPROM.h>
 
 #define PIN_LED     (13)
 #define PIN_1WIRE   (8)
