@@ -7,7 +7,7 @@ WineUI::WineUI(Adafruit_7segment * display, int digitNum ) :
   mDisplay(display), mDigitPos(digitNum), delay30Sec(30*1000)
 {
   mDisplayValue = 0;
-  mLastSetVal = 0;
+  mLastSetVal = 55;
   mCurTempVal = 0;
 
   lightOn = false;
@@ -24,16 +24,25 @@ void WineUI::Setup()
 
 void WineUI::Run()
 {
-
-  // Temp selection happened and is now complete
-  if (settingTemp && delay30Sec.CheckInterval())
-  {
-    settingTemp = false;
     
-    // Set the new temp value so it can be used by controller
-    mLastSetVal = mDisplayValue;
-
-    // flip display back to current temp
+  // Working on changing the temp
+  if (settingTemp) 
+  {
+    // Temp selection is now complete
+    if (delay30Sec.CheckInterval())
+    {
+      settingTemp = false;
+      
+      // Set the new temp value so it can be used by controller
+      mLastSetVal = mDisplayValue;
+  
+      // flip display back to current temp
+      mDisplayValue = mCurTempVal;
+    }
+  }
+  else
+  {
+    // make sure the display reflects the current temp  
     mDisplayValue = mCurTempVal;
   }
 
@@ -123,6 +132,7 @@ void WineCooler::Init()
   mCoolFan->SetRate(255);
   //mHotFan->SetRate(150);
   mHotFan->On();
+  mCooler->On();
 }
 
 void WineCooler::Run()
