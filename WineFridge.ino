@@ -20,9 +20,9 @@
 #define PIN_FAN2    (6)
 #define PIN_COOL1   (12)
 
-#define PIN_FAN3    (5)
-#define PIN_FAN4    (6)
-#define PIN_COOL2   (13)
+#define PIN_FAN3    (10)
+#define PIN_FAN4    (11)
+#define PIN_COOL2   (9)
 
 #define I2C_ADDR    (0x70)
 
@@ -44,14 +44,14 @@ HT16K33_Keypress kp(I2C_ADDR);
 TempSensor ts1(&sensors, (DeviceAddress){0x28, 0x6A, 0x13, 0x30, 0x05, 0x00, 0x00, 0x5D});
 TempSensor ts2(&sensors, (DeviceAddress){0x28, 0x03, 0x13, 0x30, 0x05, 0x00, 0x00, 0x08});
 
-PWM cool1(PIN_COOL1);
-PWM fan1(PIN_FAN1);
-PWM fan2(PIN_FAN2);
+PWM cool1(PIN_COOL2);
+PWM fan1(PIN_FAN3);
+PWM fan2(PIN_FAN4);
 
 WineUI topui(&matrix, 0);
 
 /* ui, hotTemp, coolTemp, cool, hotFan, coolFan */
-WineCooler tophalf(&topui, &ts1, &ts2, &cool1, &fan1, &fan2);
+WineCooler tophalf(&topui, &ts2, &ts1, &cool1, &fan1, &fan2);
 
 
 void setup()
