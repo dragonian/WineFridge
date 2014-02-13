@@ -5,7 +5,7 @@
 #define TEMP_MIN   (40)
    
 WineUI::WineUI(Adafruit_7segment * display, int instance ) :
-  mDisplay(display), mInstance(instance), delay30Sec(30*1000)
+  mDisplay(display), mInstance(instance), delay30Sec(15*1000)
 {
   mDisplayValue = 0;
   mLastSetVal = 55;
@@ -113,8 +113,8 @@ WineCooler::WineCooler(WineUI* ui,
   mCooler(cool),
   mHotFan(hotFan), mCoolFan(coolFan),
   every10Sec(5000),
-  mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 20,1,1, REVERSE),
-  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 20,1,1, REVERSE)  
+  mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 50,0.5,0, REVERSE),
+  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE)  
 {
    mEnabled = false;
    mDesiredTemp = 50;
