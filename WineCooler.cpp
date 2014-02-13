@@ -22,7 +22,7 @@ WineUI::WineUI(Adafruit_7segment * display, int instance ) :
 void WineUI::Setup()
 {
   // Read the last value out of the eeprom
-  mLastSetVal = EEPROM.read(mInstance);
+  mLastSetVal = CheckBounds(EEPROM.read(mInstance));
 
   mDisplay->writeDigitRaw(mDigitPos,   0x71);
   mDisplay->writeDigitRaw(mDigitPos+1, 0x71);
@@ -45,7 +45,7 @@ void WineUI::Run()
       mLastSetVal = mDisplayValue;
 
       // Save the value back to the eeprom
-      EEPROM.write(mLastSetVal, mDigitPos);
+      EEPROM.write(mInstance, mLastSetVal);
   
       // flip display back to current temp
       mDisplayValue = mCurTempVal;
@@ -127,6 +127,8 @@ WineCooler::WineCooler(WineUI* ui,
 
 void WineCooler::Init()
 {
+  mUI->Setup();
+  
   mEnabled = true;
   //mCoolPID.SetMode(MANUAL);
   mCoolPID.SetMode(AUTOMATIC);
