@@ -136,6 +136,7 @@ void WineCooler::Init()
 
   mFanPID.SetMode(AUTOMATIC);
   mFanPID.SetSampleTime(1000);
+  mFanPID.SetOutputLimits(80, 255); // don't let the fan go too slow, it'll make more noise
 
   // Setup Pins
   mHotFan->Setup();
