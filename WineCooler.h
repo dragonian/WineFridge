@@ -8,6 +8,8 @@
 #include <Adafruit_GFX.h>
 
 #include <PID_v1.h>
+#include <PID_AutoTune_v0.h>
+
 
 //==========================================================
 
@@ -64,6 +66,12 @@ public:
   void Run(void);
 
   void DebugStatus();
+
+  void changeAutoTune();
+  void AutoTuneHelper(boolean start);
+  void SerialSend();
+  void SerialReceive();
+
   
 private:
   WineUI* mUI;
@@ -80,6 +88,9 @@ private:
   PID mCoolPID;
   double mHotSetpoint, mHotTempVal, mHotFanControl;
   PID mFanPID;
+
+  PID_ATune aTune;
+
 
 };
 

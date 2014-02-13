@@ -3,7 +3,7 @@
 
 #define TEMP_MAX   (60)
 #define TEMP_MIN   (40)
-   
+
 WineUI::WineUI(Adafruit_7segment * display, int instance ) :
   mDisplay(display), mInstance(instance), delay30Sec(15*1000)
 {
@@ -105,6 +105,20 @@ int WineUI::CheckBounds(int val)
 //==========================================================
 
 
+
+byte ATuneModeRemember=2;
+double input=80, output=50, setpoint=180;
+double kp=2,ki=0.5,kd=2;
+
+double kpmodel=1.5, taup=100, theta[50];
+double outputStart=5;
+double aTuneStep=50, aTuneNoise=1, aTuneStartValue=100;
+unsigned int aTuneLookBack=20;
+
+boolean tuning = false;
+unsigned long  modelTime, serialTime;
+
+
 WineCooler::WineCooler(WineUI* ui, 
                        TempSensor * hotTemp, TempSensor * coolTemp,
                        PWM* cool, 
@@ -114,7 +128,8 @@ WineCooler::WineCooler(WineUI* ui,
   mHotFan(hotFan), mCoolFan(coolFan),
   every10Sec(5000),
   mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 50,0.5,0, REVERSE),
-  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE)  
+  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE),
+  aTune(&mInputTemp, &mOutputControl)  
 {
    mEnabled = false;
    mDesiredTemp = 50;
@@ -147,12 +162,23 @@ void WineCooler::Init()
   //mHotFan->SetRate(150);
   mHotFan->On();
   mCooler->On();
+
+
+  if(tuning)
+  {
+    tuning=false;
+    changeAutoTune();
+    tuning=true;
+  }
+  
+  serialTime = 0;
+
 }
 
 void WineCooler::Run()
 {
-  if (every10Sec.CheckInterval())
-    DebugStatus(); 
+  //if (every10Sec.CheckInterval())
+  //  DebugStatus(); 
 
   if (!mEnabled)
     return;
@@ -169,7 +195,25 @@ void WineCooler::Run()
   mUI->mCurTempVal = mInputTemp;
 
   // Run the PIDs with any input changes
-  mCoolPID.Compute();
+  if(tuning)
+  {
+    byte val = (aTune.Runtime());
+    if (val!=0)
+    {
+      tuning = false;
+    }
+    if(!tuning)
+    { //we're done, set the tuning parameters
+      kp = aTune.GetKp();
+      ki = aTune.GetKi();
+      kd = aTune.GetKd();
+      mCoolPID.SetTunings(kp,ki,kd);
+      AutoTuneHelper(false);
+    }
+  }
+  else mCoolPID.Compute();
+
+  //mCoolPID.Compute();
   mCooler->SetRate(mOutputControl);
 
   mFanPID.Compute();
@@ -187,6 +231,15 @@ void WineCooler::Run()
     mCoolFan->Off();
 
   mUI->Run();
+
+  //send-receive with processing if it's time
+  if(millis()>serialTime)
+  {
+    SerialReceive();
+    SerialSend();
+    serialTime+=500;
+  }
+
 
 }
  
@@ -226,3 +279,58 @@ void WineCooler::DebugStatus()
   Serial.print(tmp2);
   
 }
+
+void WineCooler::changeAutoTune()
+{
+ if(!tuning)
+  {
+    //Set the output to the desired starting frequency.
+    output=aTuneStartValue;
+    aTune.SetNoiseBand(aTuneNoise);
+    aTune.SetOutputStep(aTuneStep);
+    aTune.SetLookbackSec((int)aTuneLookBack);
+    AutoTuneHelper(true);
+    tuning = true;
+  }
+  else
+  { //cancel autotune
+    aTune.Cancel();
+    tuning = false;
+    AutoTuneHelper(false);
+  }
+}
+
+
+void WineCooler::AutoTuneHelper(boolean start)
+{
+  if(start)
+    ATuneModeRemember = mCoolPID.GetMode();
+  else
+    mCoolPID.SetMode(ATuneModeRemember);
+}
+
+
+void WineCooler::SerialSend()
+{
+  Serial.print("setpoint: ");Serial.print(setpoint); Serial.print(" ");
+  Serial.print("input: ");Serial.print(input); Serial.print(" ");
+  Serial.print("output: ");Serial.print(output); Serial.print(" ");
+  if(tuning){
+    Serial.println("tuning mode");
+  } else {
+    Serial.print("kp: ");Serial.print(mCoolPID.GetKp());Serial.print(" ");
+    Serial.print("ki: ");Serial.print(mCoolPID.GetKi());Serial.print(" ");
+    Serial.print("kd: ");Serial.print(mCoolPID.GetKd());Serial.println();
+  }
+}
+
+void WineCooler::SerialReceive()
+{
+  if(Serial.available())
+  {
+   char b = Serial.read(); 
+   Serial.flush(); 
+   if((b=='1' && !tuning) || (b!='1' && tuning))changeAutoTune();
+  }
+}
+

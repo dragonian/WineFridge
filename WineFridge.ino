@@ -4,6 +4,7 @@
 
 #include <Wire.h> 
 #include <PID_v1.h>
+#include <PID_AutoTune_v0.h>
 
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
@@ -29,7 +30,6 @@
 
 #define KP_INT      (2)
 
-
 LED led(PIN_LED);
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -39,7 +39,7 @@ OneWire oneWire(PIN_1WIRE);
 AsyncDallasTemperature sensors(&oneWire);
 
 Adafruit_7segment matrix;
-HT16K33_Keypress kp(I2C_ADDR);
+HT16K33_Keypress kpress(I2C_ADDR);
 
 // Discovered addresses to temp sensors, hardcoded here
 TempSensor ts1(&sensors, (DeviceAddress){0x28, 0x6A, 0x13, 0x30, 0x05, 0x00, 0x00, 0x5D});
@@ -70,8 +70,8 @@ void setup()
   tophalf.Init();
 
   // Setup Keypress interrupt
-  kp.Setup(KP_INT);
-  kp.RegisterKeypressCallback(TopKeypressCB);
+  kpress.Setup(KP_INT);
+  kpress.RegisterKeypressCallback(TopKeypressCB);
 
 }
 
@@ -80,7 +80,7 @@ void loop()
 {
   led.Tick();
   sensors.CheckTemps();
-  kp.CheckForKeypress();
+  kpress.CheckForKeypress();
 
   tophalf.Run();
   
