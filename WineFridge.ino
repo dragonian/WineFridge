@@ -54,6 +54,20 @@ WineUI topui(&matrix, 0);
 /* ui, hotTemp, coolTemp, cool, hotFan, coolFan */
 WineCooler tophalf(&topui, &ts2, &ts1, &cool1, &fan1, &fan2);
 
+//------------------------------------------------------------------------------------------
+TempSensor ts3(&sensors, (DeviceAddress){0x28, 0x29, 0x22, 0x30, 0x05, 0x00, 0x00, 0x38});
+TempSensor ts4(&sensors, (DeviceAddress){0x28, 0xFF, 0x09, 0x5F, 0x05, 0x00, 0x00, 0xCC});
+
+PWM cool2(PIN_COOL1);
+PWM fan3(PIN_FAN1);
+PWM fan4(PIN_FAN2);
+
+WineUI bottomui(&matrix, 1);
+
+/* ui, hotTemp, coolTemp, cool, hotFan, coolFan */
+WineCooler bottomhalf(&bottomui, &ts4, &ts3, &cool2, &fan3, &fan4);
+//------------------------------------------------------------------------------------------
+
 
 void setup()
 {
@@ -68,10 +82,14 @@ void setup()
   sensors.SetConversionCompleteCB(&TempConversionComplete);  
 
   tophalf.Init();
-
+  bottomhalf.Init();
+  
   // Setup Keypress interrupt
   kp.Setup(KP_INT);
   kp.RegisterKeypressCallback(TopKeypressCB);
+  kp.RegisterKeypressCallback(BottomKeypressCB);
+  
+  
 
 }
 
@@ -83,6 +101,7 @@ void loop()
   kp.CheckForKeypress();
 
   tophalf.Run();
+  bottomhalf.Run();
   
   //discoverOneWireDevices();
  
@@ -94,6 +113,8 @@ void TempConversionComplete()
 {
   ts1.ConversionComplete();
   ts2.ConversionComplete();
+  ts3.ConversionComplete();
+  ts4.ConversionComplete();
 }
 
 void TopKeypressCB(uint16_t * keydata)
@@ -114,6 +135,23 @@ void TopKeypressCB(uint16_t * keydata)
   }
 }
 
+void BottomKeypressCB(uint16_t * keydata)
+{
+  switch (keydata[1])
+  {
+    case 0x0800:
+      bottomui.Keypress(WineUI::TEMP_UP);
+      break;
+      
+    case 0x0400:
+       bottomui.Keypress(WineUI::TEMP_DOWN);
+     break;
+      
+    case 0x0200:
+       bottomui.Keypress(WineUI::LIGHT_TOGGLE);
+     break;  
+  }
+}
 
 //==========================================================
 
