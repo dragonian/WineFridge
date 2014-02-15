@@ -14,9 +14,16 @@ WineUI::WineUI(Adafruit_7segment * display, int instance ) :
   lightOn = false;
   settingTemp = false;
 
-  // Map the DigitPos to the instance number
-  // They are the same right now
-  mDigitPos = mInstance;
+  // Map the DigitPos to the instance number 
+  switch (mInstance)
+  {
+    case 0:
+      mDigitPos = 0;
+      break;
+    case 1:
+      mDigitPos = 2;
+      break;  
+  }
 }
 
 void WineUI::Setup()
