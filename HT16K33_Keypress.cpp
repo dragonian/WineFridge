@@ -38,7 +38,7 @@ boolean HT16K33_Keypress::CheckForKeypress(void)
   {
     kpMillis = millis(); 
            
-    if (int_pending == 1)
+    //if (int_pending == 1)
     {
       int_pending = 0;
       ReadKeyData();
