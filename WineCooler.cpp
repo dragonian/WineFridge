@@ -77,24 +77,34 @@ void WineUI::Run()
 
 void WineUI::Keypress(enum Keycode key)
 {
-  switch (key)
+  if (key == LIGHT_TOGGLE)
   {
-    case TEMP_UP:
+    lightOn = !lightOn; 
+  }
+  else
+  {
+    // Reset the setting time delay
+    delay30Sec.ResetTime();
+
+    // update the display with the last temp that was selected
+    if (!settingTemp)
+    {
       settingTemp = true;
-      delay30Sec.ResetTime();
-      mDisplayValue = CheckBounds(mDisplayValue+1);
-      break;
+      mDisplayValue = mLastSetVal;
+    }
+    else
+    {
+      switch (key)
+      {
+        case TEMP_UP:
+          mDisplayValue = CheckBounds(mDisplayValue+1);
+          break;
 
-    case TEMP_DOWN:
-      settingTemp = true;
-      delay30Sec.ResetTime();
-      mDisplayValue = CheckBounds(mDisplayValue-1);
-      break;
-
-    case LIGHT_TOGGLE:
-      lightOn = !lightOn; 
-      break;
-
+        case TEMP_DOWN:
+          mDisplayValue = CheckBounds(mDisplayValue-1);
+          break;
+      }
+    }
   }
 }
 
