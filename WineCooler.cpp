@@ -122,7 +122,7 @@ int WineUI::CheckBounds(int val)
 //==========================================================
 
 
-WineCooler::WineCooler(WineUI* ui, 
+WineCooler::WineCooler(int instance, WineUI* ui, 
                        TempSensor * hotTemp, TempSensor * coolTemp,
                        PWM* cool, 
                        PWM* hotFan, PWM* coolFan ) :
@@ -131,7 +131,8 @@ WineCooler::WineCooler(WineUI* ui,
   mHotFan(hotFan), mCoolFan(coolFan),
   every10Sec(5000),
   mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 50,0.5,0, REVERSE),
-  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE)  
+  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE),
+  mInstance(instance)  
 {
    mEnabled = false;
    mDesiredTemp = 50;
@@ -209,37 +210,32 @@ void WineCooler::Run()
  
 void WineCooler::DebugStatus()
 {
-
-  Serial.print("\r\nWineCooler Status: ");
-  mEnabled ?  Serial.print("ON "): Serial.print("OFF ");
-
-  Serial.print("Desired Temp: ");
+  if (mInstance == 1)
+    Serial.print("\n");
+  
   Serial.print(mDesiredTemp);
-  Serial.print(" F ");
+  Serial.print(",");
 
-  Serial.print("Current Temp: ");
   Serial.print(mInputTemp);
-  Serial.print(" F ");
-
-  Serial.print("Hot Temp: ");
-  Serial.print(mHotTempVal);
-  Serial.print(" F ");
-
-  Serial.print("Output: ");
+  Serial.print(",");
+  
   Serial.print(mOutputControl);
+  Serial.print(",");
+  
+  Serial.print(mHotTempVal);
+  Serial.print(",");
+
 
   bool tmp1;
   int tmp2;
   mHotFan->GetStatus(tmp1, tmp2);
-  Serial.print(" HotFan: ");
-  Serial.print(tmp1);
-  Serial.print(" ");
   Serial.print(tmp2);
+  Serial.print(",");
+
   
   mCoolFan->GetStatus(tmp1, tmp2);
-  Serial.print(" CoolFan: ");
-  Serial.print(tmp1);
-  Serial.print(" ");
   Serial.print(tmp2);
+  Serial.print(",");
+  Serial.print("\t");
   
 }

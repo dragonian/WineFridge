@@ -54,7 +54,7 @@ private:
 class WineCooler 
 {
 public:
-  WineCooler(WineUI* ui, 
+  WineCooler(int instance, WineUI* ui, 
             TempSensor * hotTemp,
             TempSensor * coolTemp,
             PWM* cool, 
@@ -80,6 +80,8 @@ private:
   PID mCoolPID;
   double mHotSetpoint, mHotTempVal, mHotFanControl;
   PID mFanPID;
+  
+  int mInstance;
 
 };
 

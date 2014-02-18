@@ -52,7 +52,7 @@ PWM fan2(PIN_FAN4);
 WineUI topui(&matrix, 0);
 
 /* ui, hotTemp, coolTemp, cool, hotFan, coolFan */
-WineCooler tophalf(&topui, &ts2, &ts1, &cool1, &fan1, &fan2);
+WineCooler tophalf(1, &topui, &ts2, &ts1, &cool1, &fan1, &fan2);
 
 //------------------------------------------------------------------------------------------
 TempSensor ts3(&sensors, (DeviceAddress){0x28, 0x29, 0x22, 0x30, 0x05, 0x00, 0x00, 0x38});
@@ -65,7 +65,7 @@ PWM fan4(PIN_FAN2);
 WineUI bottomui(&matrix, 1);
 
 /* ui, hotTemp, coolTemp, cool, hotFan, coolFan */
-WineCooler bottomhalf(&bottomui, &ts4, &ts3, &cool2, &fan3, &fan4);
+WineCooler bottomhalf(2, &bottomui, &ts4, &ts3, &cool2, &fan3, &fan4);
 //------------------------------------------------------------------------------------------
 
 
