@@ -12,6 +12,7 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <EEPROM.h>
+#include <avr/wdt.h>
 
 #define PIN_LED     (13)
 #define PIN_1WIRE   (8)
@@ -71,6 +72,7 @@ WineCooler bottomhalf(2, &bottomui, &ts4, &ts3, &cool2, &fan3, &fan4);
 
 void setup()
 {
+  wdt_disable();
   Serial.begin(9600);
   led.Setup();
 
@@ -90,7 +92,7 @@ void setup()
   kp.RegisterKeypressCallback(BottomKeypressCB);
   
   
-
+  wdt_enable(WDTO_1S);
 }
 
 
@@ -106,6 +108,7 @@ void loop()
   //discoverOneWireDevices();
  
   delay(10);
+  wdt_reset();
 }
 
 
