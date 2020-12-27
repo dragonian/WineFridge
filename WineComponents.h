@@ -34,7 +34,7 @@ private:
 class TempSensor
 {
 public:
-  TempSensor(DallasTemperature * dt, DeviceAddress addr);
+  TempSensor(DallasTemperature * dt, DeviceAddress addr, float offset = 0.0);
   
   typedef void TempCallback(DeviceAddress, unsigned int temp);
   
@@ -51,10 +51,7 @@ private:
   TempCallback * mCB;
 
   float mTemp;
-  
+  float mCorrectionOffset;
 };
 
 #endif
-
-
-
