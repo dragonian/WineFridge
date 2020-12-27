@@ -130,8 +130,8 @@ WineCooler::WineCooler(int instance, WineUI* ui,
   mCooler(cool),
   mHotFan(hotFan), mCoolFan(coolFan),
   every10Sec(5000),
-  mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 50,0.5,0, REVERSE),
-  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,0,0, REVERSE),
+  mCoolPID(&mInputTemp, &mOutputControl, &mDesiredTemp, 50, 0.5, 0, REVERSE),
+  mFanPID(&mHotTempVal, &mHotFanControl, &mHotSetpoint, 40,   0, 0, REVERSE),
   mInstance(instance)  
 {
    mEnabled = false;

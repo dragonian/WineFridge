@@ -49,7 +49,7 @@ void PWM::GetStatus(bool & _onff, int & _rate)
 //==========================================================
 
 
-TempSensor::TempSensor(DallasTemperature * dt, DeviceAddress addr) : mDT(dt), mCB(NULL)
+TempSensor::TempSensor(DallasTemperature * dt, DeviceAddress addr, float offset) : mDT(dt), mCB(NULL), mCorrectionOffset(offset)
 {
    memcpy(mAddr,addr,8);
 }
@@ -61,7 +61,7 @@ void TempSensor::SetTempCallback(const TempCallback* cb)
  
 void TempSensor::ConversionComplete()
 {
-  mTemp = mDT->getTempF(mAddr);
+  mTemp = mDT->getTempF(mAddr) + mCorrectionOffset;
       
   if (mCB)
     mCB(mAddr, (int)mTemp);
@@ -74,7 +74,3 @@ float TempSensor::GetTemp()
 }
   
  
-
-
-
-
